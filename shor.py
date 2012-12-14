@@ -11,24 +11,21 @@ class Shors:
 		# self.exponent = int(2 * math.log(self.n, ))
 
 	def run(self):
-		self.c = Decimal(self.get_num_from_server())
-		q = Decimal(self.pick_q(self.n))
-		print "\n\n" , q
-		if q > 2 * (self.n**2) and q < 3 * (self.n**2):
-			print "YOU KNOW IT BOYYYYY"
-		else:
-			print "BADDDD"
-			raw_input()
+		self.c = self.get_num_from_server()
+		q = self.pick_q(self.n)
 
-		print "Q: " , len(str(q))
-		print "C: " , len(str(self.c))
-		ps, qs = self.get_convergents(self.c, q)
-		r = -9999
-		for i in range(len(qs)):
-			if qs[i] > n:
-				r = qs[i-1]
+		ri = self.get_convergents(self.c, q)
 
-		print "ORDER: " , r
+		val = pow(self.x, ri, self.n)
+		i = 1
+		while val != 1 and i < 1024:
+			val = pow(self.x, ri*i, self.n)
+			i += 1
+
+		if val == 1:
+			print "ORDER: " , str(ri * i)
+		
+		
 
 	def pick_q(self, n):
 		l = 1
@@ -63,47 +60,40 @@ class Shors:
 		denom = long(denom)
 		ans = []
 		while denom > 0:
-			print "num: " , num
-			print "denom: " , denom
 			a = num // denom
 			if denom != 0:
 				ans.append(a)
-				print "ans: " , ans
-				raw_input()
  
- 			print num
- 			print a
  			remain = num - (denom * a)
 			num = denom
 			denom = remain
 
+		return ans
+
 	def get_convergents(self, num, denom):
 		a = self.get_continued_fraction(num, denom)
+		print "a: " , a
+		raw_input()
 		p = []
 		q = []
 		index = len(a)
 		p.append(a[0])
-		p.append(a[0] * a[1] + Decimal(1))
+		p.append(a[0] * a[1] + 1)
 		q.append(1)
 		q.append(a[1])
 
-		for i in range(2, index):
+		for i in range(2, len(a)):
 			pval = a[i] * p[i-1] + p[i-2]
 			qval = a[i] * q[i-1] + q[i-2]
-			print "QVAL: " , qval
-			print self.c
 			if qval > self.n:
-				print "ORDER: " , qval
+				ri = q[i-1]
+				print "ri: " , ri
 				raw_input()
-				return qval
+				return ri
 			p.append(pval)
 			q.append(qval)
 
-		# print "p: " , p
-		# print "q: " , q
-		return p[index-1]/q[index-1]
-
-		# return a[i] * self.get_convergents(x, i-1) , a[i] * 
+		return False
 
 
 	def simulated_shors():
@@ -111,5 +101,5 @@ class Shors:
 
 
 
-Shors().get_convergents(153.0, 53.0)
-# Shors().run()
+# Shors().get_convergents(153.0, 53.0)
+Shors().run()
