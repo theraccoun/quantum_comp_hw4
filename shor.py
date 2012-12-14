@@ -6,17 +6,23 @@ class Shors:
 
 	def __init__(self):
 		self.n = 26825926351488399110544112048484691246984742691774090660107762225282840929762385037237484102637951592668796347757856945214753994377357682664648613794306195119897925017866009997263150512915863644811383848031675519987679409974919170391509730554029294470146117971727639921754779476671008586376903725402571129
-		self.exponent = int(2 * math.log(self.n, ))
-		print "exp: " , self.exponent
+		self.x = 1234567899002948572095479072038957423098574389025702943570429857023498574029572409857243890574395847208395798204309845704239570293485904852742095872043348674239085730489574239085709348574823957483957204985709438570948237504982357204395782394573042985704293875209457023944857394857423095423498572034857329
+		self.exponent = 2048
+		# self.exponent = int(2 * math.log(self.n, ))
 
 	def run(self):
 		self.c = Decimal(self.get_num_from_server())
 		q = Decimal(self.pick_q(self.n))
 		print "\n\n" , q
-		if q > 2 * (self.c**2) and q < 3 * (self.c**2):
+		if q > 2 * (self.n**2) and q < 3 * (self.n**2):
 			print "YOU KNOW IT BOYYYYY"
+		else:
+			print "BADDDD"
+			raw_input()
 
-		ps, qs = self.get_convergents(self.c/q)
+		print "Q: " , len(str(q))
+		print "C: " , len(str(self.c))
+		ps, qs = self.get_convergents(self.c, q)
 		r = -9999
 		for i in range(len(qs)):
 			if qs[i] > n:
@@ -26,53 +32,55 @@ class Shors:
 
 	def pick_q(self, n):
 		l = 1
-		q = 2**l
-		print "n: " , n
 		while True:
+			q = 2**l
 			if q > 3 * (n**2):
-				q = 3*q/4
+				q = q/4*3
 				continue
 
 			if q > 2 * (n**2):
 				return q
 
-			q = 2**l
 			l += 1
 
 
 	def get_num_from_server(self):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect(("annai.cs.colorado.edu", 443))
-		s.send("123456 " + str(self.exponent) + "\n")
+		s.send(str(self.x) + " " + str(self.exponent) + "\n")
 
 		while True:
-			n = s.recv(2048)
-			if len(n) > 5:
-				return int(n)
+			c = s.recv(2048)
+			if len(c) > 5:
+				print c
+				raw_input()
+				return c
 
 
-	def get_continued_fraction(self, x):
+	def get_continued_fraction(self, num, denom):
 		getcontext().prec = 500
-		k = 1
-		xk = x
+		num = long(num)
+		denom = long(denom)
 		ans = []
-		a = Decimal(math.floor(x))
-		while True:
-			print "a: " , Decimal(a)
-			if (len(str(a)) > 200):
-				return ans
-			ans.append(a)
-			# if Decimal(xk) - Decimal(a) < 1e-12:
-			# 	return ans
-			remainder = Decimal(xk) - Decimal(a)
-			xk = Decimal(1) / remainder
-			a = Decimal(1) // remainder
-			k += 1
+		while denom > 0:
+			print "num: " , num
+			print "denom: " , denom
+			a = num // denom
+			if denom != 0:
+				ans.append(a)
+				print "ans: " , ans
+				raw_input()
+ 
+ 			print num
+ 			print a
+ 			remain = num - (denom * a)
+			num = denom
+			denom = remain
 
-	def get_convergents(self, x):
+	def get_convergents(self, num, denom):
+		a = self.get_continued_fraction(num, denom)
 		p = []
 		q = []
-		a = self.get_continued_fraction(x)
 		index = len(a)
 		p.append(a[0])
 		p.append(a[0] * a[1] + Decimal(1))
@@ -83,7 +91,8 @@ class Shors:
 			pval = a[i] * p[i-1] + p[i-2]
 			qval = a[i] * q[i-1] + q[i-2]
 			print "QVAL: " , qval
-			if qval > self.c:
+			print self.c
+			if qval > self.n:
 				print "ORDER: " , qval
 				raw_input()
 				return qval
@@ -102,5 +111,5 @@ class Shors:
 
 
 
-# Shors().get_convergents(153.0/53.0)
-Shors().run()
+Shors().get_convergents(153.0, 53.0)
+# Shors().run()
